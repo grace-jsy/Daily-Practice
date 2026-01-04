@@ -2,8 +2,10 @@ package example.crudschedule.schedule.controller;
 
 import example.crudschedule.schedule.dto.ScheduleCreateRequest;
 import example.crudschedule.schedule.dto.ScheduleResponse;
+import example.crudschedule.schedule.dto.ScheduleUpdateRequest;
 import example.crudschedule.schedule.repository.ScheduleRepository;
 import example.crudschedule.schedule.service.ScheduleService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,5 +47,14 @@ public class ScheduleController {
         List<ScheduleResponse> scheduleResponses = scheduleService.getAllSchedules();
 
         return new ResponseEntity<>(scheduleResponses, HttpStatus.OK);
+    }
+
+    // 일정 수정
+    @PutMapping("/schedules/{id}")
+    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleUpdateRequest request) {
+
+        ScheduleResponse scheduleResponse = scheduleService.updateSchedule(id, request.getTitle(), request.getContent());
+
+        return new ResponseEntity<>(scheduleResponse, HttpStatus.OK);
     }
 }

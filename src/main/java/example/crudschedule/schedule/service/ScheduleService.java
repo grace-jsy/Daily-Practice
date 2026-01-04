@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -55,5 +56,31 @@ public class ScheduleService {
                 .stream()
                 .map(ScheduleResponse::toDto)
                 .toList();
+    }
+
+
+    // 일정 수정
+    public ScheduleResponse updateSchedule(Long id, String title, String content) {
+
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid schedule id");
+        }
+
+        Schedule schedule = scheduleRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Schedule not found")
+        );
+
+        schedule.update(title, content);
+
+        // Schedule savedSchedule = scheduleRepository.save(schedule);
+        /*
+            @Transactional이 붙어있는 메서드가 실행되면 영속성 컨텍스트 라는 관리 공간이 생긴다
+            DB에서 엔티티를 조회하면 그 엔티티를 JPA가 관리(추적)하기 시작함
+            즉, schedule 객체를 JPA가 계속 관찰하고 있는 상태
+            JPA가 트랜잭션이 끝날 때(커밋할 때) 처음 조회했을 때 값과 지금 값을 비교해서 바뀌었으면,
+            UPDATE SQL을 자동으로 날려준기 때문에 save가 없어도 됨.
+         */
+
+        return ScheduleResponse.toDto(schedule);
     }
 }
